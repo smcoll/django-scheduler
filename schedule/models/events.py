@@ -7,6 +7,7 @@ from django.contrib.contenttypes import generic
 from django.db import models
 from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.localflavor.us.models import PhoneNumberField
 from django.core.urlresolvers import reverse
 from django.template.defaultfilters import date
 from django.utils.translation import ugettext, ugettext_lazy as _
@@ -36,6 +37,21 @@ class Event(models.Model):
     rule = models.ForeignKey(Rule, null = True, blank = True, verbose_name=_("rule"), help_text=_("Select '----' for a one time only event."))
     end_recurring_period = models.DateTimeField(_("end recurring period"), null = True, blank = True, help_text=_("This date is ignored for one time only events."))
     calendar = models.ForeignKey(Calendar, null=True, blank=True)
+
+    # location
+    venue_name = models.CharField(_('venue_name'), max_length=100, blank=True)
+    address = models.TextField(_('address'), blank=True)
+
+    # cost and tickets
+    cost = models.CharField(_('cost'), max_length=100, blank=True)
+    buy_tickets_url = models.URLField(_('buy tickets URL'), blank=True)
+
+    # organizer contact info
+    contact = models.CharField(_('contact name'), max_length=100, blank=True)
+    phone_number = PhoneNumberField(_('phone number'), blank=True)
+    email = models.EmailField(_('e-mail'), max_length=254, blank=True)
+    url = models.URLField(_('external URL'), blank=True)
+
     objects = EventManager()
 
     class Meta:
