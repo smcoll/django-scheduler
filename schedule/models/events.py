@@ -39,7 +39,7 @@ class Event(models.Model):
     calendar = models.ForeignKey(Calendar, null=True, blank=True)
 
     # location
-    venue_name = models.CharField(_('venue_name'), max_length=100, blank=True)
+    venue_name = models.CharField(_('venue name'), max_length=100, blank=True)
     address = models.TextField(_('address'), blank=True)
 
     # cost and tickets
