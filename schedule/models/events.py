@@ -29,10 +29,11 @@ class EventCategory(models.Model):
     Simple ``Event`` classification, based loosely on django-swingtime
 
     '''
-    name = models.CharField(_("name"), max_length = 200)
-    slug = models.SlugField(_("slug"),max_length = 200)
+    name = models.CharField(_("name"), max_length=200)
+    slug = models.SlugField(_("slug"))
 
     class Meta:
+        app_label = 'schedule'
         verbose_name = _('event category')
         verbose_name_plural = _('event categories')
 
