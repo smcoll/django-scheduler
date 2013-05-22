@@ -8,7 +8,7 @@ class CalendarAdminOptions(admin.ModelAdmin):
     search_fields = ['name']
 
 
-class EventCagtegoryAdmin(admin.ModelAdmin):
+class EventCategoryAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
     search_fields = ['name']
 
