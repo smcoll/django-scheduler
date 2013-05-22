@@ -23,6 +23,23 @@ class EventManager(models.Manager):
     def get_for_object(self, content_object, distinction=None, inherit=True):
         return EventRelation.objects.get_events_for_object(content_object, distinction, inherit)
 
+
+class EventCategory(models.Model):
+    '''
+    Simple ``Event`` classification, based loosely on django-swingtime
+
+    '''
+    name = models.CharField(_("name"), max_length = 200)
+    slug = models.SlugField(_("slug"),max_length = 200)
+
+    class Meta:
+        verbose_name = _('event category')
+        verbose_name_plural = _('event categories')
+
+    def __unicode__(self):
+        return self.name
+
+
 class Event(models.Model):
     '''
     This model stores meta data for a date.  You can relate this data to many
@@ -37,6 +54,7 @@ class Event(models.Model):
     rule = models.ForeignKey(Rule, null = True, blank = True, verbose_name=_("rule"), help_text=_("Select '----' for a one time only event."))
     end_recurring_period = models.DateTimeField(_("end recurring period"), null = True, blank = True, help_text=_("This date is ignored for one time only events."))
     calendar = models.ForeignKey(Calendar, null=True, blank=True)
+    category = models.ForeignKey(EventCategory, null=True, blank=True)
 
     # location
     venue_name = models.CharField(_('venue name'), max_length=100, blank=True)
