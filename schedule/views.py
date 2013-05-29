@@ -90,6 +90,7 @@ def calendar_by_periods(request, calendar_slug, category_slug=None, periods=None
             'date': date,
             'periods': period_objects,
             'calendar': calendar,
+            'category': category,
             'weekday_names': weekday_names,
             'here':quote(request.get_full_path()),
         },context_instance=RequestContext(request),)

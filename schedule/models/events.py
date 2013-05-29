@@ -40,10 +40,6 @@ class EventCategory(models.Model):
     def __unicode__(self):
         return self.name
 
-    def get_absolute_url(self):
-        # TODO: make calendar slug variable, rather than 'default'
-        return reverse('month_calendar_category', args=['default', self.slug])
-
 
 class Event(models.Model):
     '''

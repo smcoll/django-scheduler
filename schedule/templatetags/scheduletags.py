@@ -174,23 +174,24 @@ def querystring_for_date(date, num=6):
     return query_string
 
 @register.simple_tag
-def prev_url(target, slug, period):
+def prev_url(target, slug, period, category_slug=None):
     return '%s%s' % (
-        reverse(target, kwargs=dict(calendar_slug=slug)),
+        reverse(target, kwargs=dict(calendar_slug=slug, category_slug=category_slug)),
             querystring_for_date(period.prev().start))
 
 @register.simple_tag
-def next_url(target, slug, period):
+def next_url(target, slug, period, category_slug=None):
     return '%s%s' % (
-        reverse(target, kwargs=dict(calendar_slug=slug)),
+        reverse(target, kwargs=dict(calendar_slug=slug, category_slug=category_slug)),
             querystring_for_date(period.next().start))
 
 @register.inclusion_tag("schedule/_prevnext.html")
-def prevnext( target, slug, period, fmt=None):
+def prevnext( target, slug, period, fmt=None, category_slug=None):
     if fmt is None:
         fmt = settings.DATE_FORMAT
     context = {
         'slug' : slug,
+        'category_slug' : category_slug,
         'period' : period,
         'period_name': format(period.start, fmt),
         'target':target,
