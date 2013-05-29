@@ -38,9 +38,9 @@ if not CHECK_PERMISSION_FUNC:
 # Imports have to be placed within the function body to avoid circular imports
 GET_EVENTS_FUNC = getattr(settings, 'GET_EVENTS_FUNC', None)
 if not GET_EVENTS_FUNC:
-    def get_events(request, calendar, category_slug=None):
-        if category_slug:
-            return calendar.event_set.filter(category__slug=category_slug)
+    def get_events(request, calendar, category=None):
+        if category:
+            return calendar.event_set.filter(category=category)
         return calendar.event_set.all()
 
     GET_EVENTS_FUNC = get_events

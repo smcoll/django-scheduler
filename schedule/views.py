@@ -70,7 +70,9 @@ def calendar_by_periods(request, calendar_slug, periods=None, category_slug=None
 
     """
     calendar = get_object_or_404(Calendar, slug=calendar_slug)
-    category = get_object_or_404(EventCategory, slug=category_slug)
+    category = None
+    if category_slug:
+        category = get_object_or_404(EventCategory, slug=category_slug)
     date = coerce_date_dict(request.GET)
     if date:
         try:
@@ -79,7 +81,10 @@ def calendar_by_periods(request, calendar_slug, periods=None, category_slug=None
             raise Http404
     else:
         date = timezone.now()
-    event_list = GET_EVENTS_FUNC(request, calendar)
+    if category:
+        event_list = GET_EVENTS_FUNC(request, calendar, category)
+    else:
+        event_list = GET_EVENTS_FUNC(request, calendar)
     period_objects = dict([(period.__name__.lower(), period(event_list, date)) for period in periods])
     return render_to_response(template_name,{
             'date': date,
