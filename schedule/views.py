@@ -11,7 +11,7 @@ from django.views.generic.edit import DeleteView
 
 from schedule.conf.settings import GET_EVENTS_FUNC, OCCURRENCE_CANCEL_REDIRECT
 from schedule.forms import EventForm, OccurrenceForm
-from schedule.models import Calendar, Occurrence, Event
+from schedule.models import Calendar, Occurrence, Event, EventCategory
 from schedule.periods import weekday_names
 from schedule.utils import check_event_permissions, coerce_date_dict
 
@@ -32,7 +32,7 @@ def calendar(request, calendar_slug, template='schedule/calendar.html'):
         "calendar": calendar,
     }, context_instance=RequestContext(request))
 
-def calendar_by_periods(request, calendar_slug, periods=None,
+def calendar_by_periods(request, calendar_slug, periods=None, category_slug=None,
     template_name="schedule/calendar_by_period.html"):
     """
     This view is for getting a calendar, but also getting periods with that
@@ -61,12 +61,16 @@ def calendar_by_periods(request, calendar_slug, periods=None,
     ``calendar``
         This is the Calendar that is designated by the ``calendar_slug``.
 
+    ``category``
+        This is the EventCategory designated by `category_slug`.
+
     ``weekday_names``
         This is for convenience. It returns the local names of weekedays for
         internationalization.
 
     """
     calendar = get_object_or_404(Calendar, slug=calendar_slug)
+    category = get_object_or_404(EventCategory, slug=category_slug)
     date = coerce_date_dict(request.GET)
     if date:
         try:
