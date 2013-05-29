@@ -32,7 +32,7 @@ def calendar(request, calendar_slug, template='schedule/calendar.html'):
         "calendar": calendar,
     }, context_instance=RequestContext(request))
 
-def calendar_by_periods(request, calendar_slug, periods=None, category_slug=None,
+def calendar_by_periods(request, calendar_slug, category_slug=None, periods=None,
     template_name="schedule/calendar_by_period.html"):
     """
     This view is for getting a calendar, but also getting periods with that
