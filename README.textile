@@ -22,7 +22,7 @@ h2. Installation
 
 Download the code; put in into your project's directory or run <pre>python setup.py install</pre> to install system-wide.
 
-REQUIREMENTS: python-vobject (comes with most distribution as a package).
+REQUIREMENTS: python-vobject (comes with most distribution as a package), django-tagging
 
 h2. Settings.py
 

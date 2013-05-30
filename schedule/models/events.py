@@ -11,12 +11,15 @@ from django.contrib.localflavor.us.models import PhoneNumberField
 from django.core.urlresolvers import reverse
 from django.template.defaultfilters import date
 from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils import timezone
 
 from schedule.conf import settings
 from schedule.models.rules import Rule
 from schedule.models.calendars import Calendar
 from schedule.utils import OccurrenceReplacer
-from django.utils import timezone
+from tagging.fields import TagField
+from tagging.utils import parse_tag_input
+
 
 class EventManager(models.Manager):
 
@@ -56,6 +59,7 @@ class Event(models.Model):
     end_recurring_period = models.DateTimeField(_("end recurring period"), null = True, blank = True, help_text=_("This date is ignored for one time only events."))
     calendar = models.ForeignKey(Calendar, null=True, blank=True)
     category = models.ForeignKey(EventCategory, null=True, blank=True)
+    tags = TagField(_('tags'))
 
     # location
     venue_name = models.CharField(_('venue name'), max_length=100, blank=True)
@@ -86,6 +90,12 @@ class Event(models.Model):
             'end': date(self.end, date_format),
         }
 
+    @property
+    def tags_list(self):
+        """
+        Return iterable list of tags.
+        """
+        return parse_tag_input(self.tags)
 
     def get_absolute_url(self):
         return reverse('event', args=[self.id])

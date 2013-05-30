@@ -29,7 +29,7 @@ setup(
                  'Operating System :: OS Independent',
                  'Programming Language :: Python',
                  'Topic :: Utilities'],
-    install_requires=['vobject', 'python-dateutil'],
+    install_requires=['vobject', 'python-dateutil', 'django-tagging>=0.3.1'],
     license='BSD',
     test_suite = "schedule.tests",
 )
