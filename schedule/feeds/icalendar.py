@@ -14,7 +14,7 @@ EVENT_ITEMS = (
     # ('rrule', 'rrule'),
     ('summary', 'summary'),
     ('url', 'url'),
-    ('x-cost', 'x-cost'),
+    ('x_cost', 'x_cost'),
     ('last_modified', 'last_modified'),
     ('created', 'created'),
 )
