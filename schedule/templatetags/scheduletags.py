@@ -35,6 +35,9 @@ def day_cell(context,  calendar, day, month, size="regular" ):
     })
     return context
 
+@register.assignment_tag(takes_context=True)
+def get_event_categories(context):
+    return EventCategory.objects.all()
 
 @register.inclusion_tag("schedule/_daily_table.html", takes_context=True)
 def daily_table( context, day, width, width_slot, height, start=8, end=20, increment=30):
