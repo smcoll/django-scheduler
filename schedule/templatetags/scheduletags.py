@@ -177,17 +177,27 @@ def querystring_for_date(date, num=6):
 def prev_url(target, slug, period, category_slug=None):
     if category_slug == '':
         category_slug = None
-    return '%s%s' % (
-        reverse(target, kwargs=dict(calendar_slug=slug, category_slug=category_slug)),
-            querystring_for_date(period.prev().start))
+    if category_slug:
+        return '%s%s' % (
+            reverse(target, kwargs=dict(calendar_slug=slug, category_slug=category_slug)),
+                querystring_for_date(period.prev().start))
+    else:
+        return '%s%s' % (
+            reverse(target, kwargs=dict(calendar_slug=slug)),
+                querystring_for_date(period.prev().start))
 
 @register.simple_tag
 def next_url(target, slug, period, category_slug=None):
     if category_slug == '':
         category_slug = None
-    return '%s%s' % (
-        reverse(target, kwargs=dict(calendar_slug=slug, category_slug=category_slug)),
-            querystring_for_date(period.next().start))
+    if category_slug:
+        return '%s%s' % (
+            reverse(target, kwargs=dict(calendar_slug=slug, category_slug=category_slug)),
+                querystring_for_date(period.next().start))
+    else:
+        return '%s%s' % (
+            reverse(target, kwargs=dict(calendar_slug=slug)),
+                querystring_for_date(period.next().start))
 
 @register.inclusion_tag("schedule/_prevnext.html")
 def prevnext( target, slug, period, fmt=None, category_slug=None):
