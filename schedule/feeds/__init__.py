@@ -70,4 +70,4 @@ class CalendarICalendar(ICalendarFeed):
         return item.title
 
     def item_created(self, item):
-        return item.created_on
+        return item.event.created_on
