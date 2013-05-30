@@ -58,7 +58,7 @@ class CalendarICalendar(ICalendarFeed):
         return cal.occurrences_after()
 
     def item_uid(self, item):
-        return str(item.id)
+        return str(item.event.id)
 
     def item_start(self, item):
         return item.start
