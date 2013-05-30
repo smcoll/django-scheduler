@@ -1,12 +1,15 @@
-from schedule.models import Calendar
+import datetime, itertools
+
 from django.contrib.syndication.views import FeedDoesNotExist
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
+from django.http import HttpResponse
+from django.utils import timezone
+
 from schedule.feeds.atom import Feed
 from schedule.feeds.icalendar import ICalendarFeed
-from django.http import HttpResponse
-import datetime, itertools
-from django.utils import timezone
+from schedule.models import Calendar
+
 
 class UpcomingEventsFeed(Feed):
     feed_id = "upcoming"
@@ -51,7 +54,8 @@ class CalendarICalendar(ICalendarFeed):
         cal_id = self.args[1]
         cal = Calendar.objects.get(pk=cal_id)
 
-        return cal.events.all()
+        # return cal.events.all()
+        return cal.occurrences_after()
 
     def item_uid(self, item):
         return str(item.id)
