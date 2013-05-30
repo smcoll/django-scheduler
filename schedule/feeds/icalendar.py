@@ -6,17 +6,17 @@ from django.http import HttpResponse
 EVENT_ITEMS = (
     ('uid', 'uid'),
     # ('dtstamp', 'dtstamp'),
-    # ('contact', 'contact'),
-    # ('description', 'description'),
+    ('contact', 'contact'),
+    ('description', 'description'),
     ('dtstart', 'start'),
     ('dtend', 'end'),
     ('location', 'location'),
     # ('rrule', 'rrule'),
     ('summary', 'summary'),
-    # ('url', 'url'),
-    # ('x-cost', 'x-cost'),
-    # ('last_modified', 'last_modified'),
-    # ('created', 'created'),
+    ('url', 'url'),
+    ('x-cost', 'x-cost'),
+    ('last_modified', 'last_modified'),
+    ('created', 'created'),
 )
 
 class ICalendarFeed(object):
@@ -26,8 +26,6 @@ class ICalendarFeed(object):
         self.kwargs = kwargs
 
         cal = vobject.iCalendar()
-        # cal.calscale = 'GREGORIAN'
-        # cal.x_wr_timezone = settings.TIME_ZONE
 
         for item in self.items():
 
@@ -65,4 +63,16 @@ class ICalendarFeed(object):
         pass
 
     def item_created(self, item):
+        pass
+
+    def item_url(self, item):
+        pass
+
+    def item_contact(self, item):
+        pass
+
+    def item_description(self, item):
+        pass
+
+    def item_x_cost(self, item):
         pass
