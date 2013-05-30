@@ -1,15 +1,22 @@
 import vobject
 
+from django.conf import settings
 from django.http import HttpResponse
 
 EVENT_ITEMS = (
     ('uid', 'uid'),
+    # ('dtstamp', 'dtstamp'),
+    # ('contact', 'contact'),
+    # ('description', 'description'),
     ('dtstart', 'start'),
     ('dtend', 'end'),
-    ('summary', 'summary'),
     ('location', 'location'),
-    ('last_modified', 'last_modified'),
-    ('created', 'created'),
+    # ('rrule', 'rrule'),
+    ('summary', 'summary'),
+    # ('url', 'url'),
+    # ('x-cost', 'x-cost'),
+    # ('last_modified', 'last_modified'),
+    # ('created', 'created'),
 )
 
 class ICalendarFeed(object):
@@ -17,8 +24,10 @@ class ICalendarFeed(object):
     def __call__(self, *args, **kwargs):
         self.args = args
         self.kwargs = kwargs
-        
+
         cal = vobject.iCalendar()
+        cal.calscale = 'GREGORIAN'
+        cal.x_wr_timezone = settings.TIME_ZONE
 
         for item in self.items():
 

@@ -58,7 +58,7 @@ class CalendarICalendar(ICalendarFeed):
         return cal.occurrences_after()
 
     def item_uid(self, item):
-        return str(item.event.id)
+        return item.get_absolute_url()
 
     def item_start(self, item):
         return item.start
@@ -71,3 +71,10 @@ class CalendarICalendar(ICalendarFeed):
 
     def item_created(self, item):
         return item.event.created_on
+
+    def item_description(self, item):
+        return item.event.description
+
+    def item_location(self, item):
+        if item.event.venue_name:
+            return item.event.venue_name
