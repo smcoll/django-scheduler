@@ -77,7 +77,7 @@ class CalendarICalendar(ICalendarFeed):
 
     def item_location(self, item):
         attr_list = ['venue_name', 'address']
-        contact_details = [getattr(item.event, x) for x in attr_list if getattr(e, x) != '']
+        contact_details = [getattr(item.event, x) for x in attr_list if getattr(item.event, x) != '']
         return u'; '.join(contact_details)
 
     def item_url(self, item):
@@ -89,7 +89,7 @@ class CalendarICalendar(ICalendarFeed):
 
     def item_contact(self, item):
         attr_list = ['contact', 'phone_number', 'email', 'url']
-        contact_details = [getattr(item.event, x) for x in attr_list if getattr(e, x) != '']
+        contact_details = [getattr(item.event, x) for x in attr_list if getattr(item.event, x) != '']
         return u'; '.join(contact_details)
 
     def item_x_cost(self, item):
