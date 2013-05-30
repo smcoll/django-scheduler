@@ -26,8 +26,8 @@ class ICalendarFeed(object):
         self.kwargs = kwargs
 
         cal = vobject.iCalendar()
-        cal.calscale = 'GREGORIAN'
-        cal.x_wr_timezone = settings.TIME_ZONE
+        # cal.calscale = 'GREGORIAN'
+        # cal.x_wr_timezone = settings.TIME_ZONE
 
         for item in self.items():
 
