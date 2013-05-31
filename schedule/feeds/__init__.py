@@ -5,6 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.http import HttpResponse
 from django.utils import timezone
+from django.utils.html import strip_tags
 
 from schedule.feeds.atom import Feed
 from schedule.feeds.icalendar import ICalendarFeed
@@ -50,6 +51,8 @@ class UpcomingEventsFeed(Feed):
 
 
 class CalendarICalendar(ICalendarFeed):
+    """ TODO: add support for RRULE, and use event rather than occurrence """
+
     def items(self):
         cal_id = self.args[1]
         cal = Calendar.objects.get(pk=cal_id)
@@ -85,7 +88,7 @@ class CalendarICalendar(ICalendarFeed):
         return item.get_absolute_url()
 
     def item_description(self, item):
-        return item.description
+        return strip_tags(item.description)
 
     def item_contact(self, item):
         attr_list = ['contact', 'phone_number', 'email', 'url']
