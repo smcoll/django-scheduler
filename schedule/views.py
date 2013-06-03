@@ -33,7 +33,7 @@ def calendar(request, calendar_slug, template='schedule/calendar.html'):
     }, context_instance=RequestContext(request))
 
 def calendar_by_periods(request, calendar_slug, category_slug=None, periods=None,
-    template_name="schedule/calendar_by_period.html"):
+    template_name="schedule/calendar_by_period.html", tzinfo=None):
     """
     This view is for getting a calendar, but also getting periods with that
     calendar.  Which periods you get, is designated with the list periods. You
@@ -85,7 +85,9 @@ def calendar_by_periods(request, calendar_slug, category_slug=None, periods=None
         event_list = GET_EVENTS_FUNC(request, calendar, category)
     else:
         event_list = GET_EVENTS_FUNC(request, calendar)
-    period_objects = dict([(period.__name__.lower(), period(event_list, date)) for period in periods])
+    if not tzinfo:
+        tzinfo = timezone.get_default_timezone()
+    period_objects = dict([(period.__name__.lower(), period(event_list, date, tzinfo=tzinfo)) for period in periods])
     return render_to_response(template_name,{
             'date': date,
             'periods': period_objects,
