@@ -293,8 +293,10 @@ class Day(Period):
             parent_persisted_occurrences, occurrence_pool)
 
     def _get_day_range(self, date):
+        """ finds the start and end datetimes for a datetime on a given day """
         if isinstance(date, datetime.datetime):
-            date = date.date()
+            # date = date.date()
+            date = current_tz.normalize().date()
         start = datetime.datetime.combine(date, datetime.time.min).replace(tzinfo=self.tzinfo)
         end = start + datetime.timedelta(days=1)
         return start, end
