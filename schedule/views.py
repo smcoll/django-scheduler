@@ -43,7 +43,8 @@ def calendar_by_periods(request, calendar_slug, category_slug=None, periods=None
     Context Variables
 
     ``date``
-        This was the date that was generated from the query string.
+        This was the timezone-aware datetime that was generated from the query
+        string, with tzinfo set to reflect the site's TIME_ZONE
 
     ``periods``
         this is a dictionary that returns the periods from the list you passed
@@ -74,13 +75,15 @@ def calendar_by_periods(request, calendar_slug, category_slug=None, periods=None
     if category_slug:
         category = get_object_or_404(EventCategory, slug=category_slug)
     date = coerce_date_dict(request.GET)
+    tz = timezone.get_default_timezone()
     if date:
         try:
-            date = datetime.datetime(**date)
+            naive = datetime.datetime(**date)
+            date = timezone.make_aware(naive, tz)
         except ValueError:
             raise Http404
     else:
-        date = timezone.now()
+        date = tz.normalize(timezone.now().astimezone(tz))
     if category:
         event_list = GET_EVENTS_FUNC(request, calendar, category)
     else:
