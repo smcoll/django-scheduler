@@ -294,7 +294,7 @@ class Day(Period):
             instant = timezone.now()
         start, end = self._get_day_range(instant)
         super(Day, self).__init__(events, start, end,
-            parent_persisted_occurrences, occurrence_pool)
+            parent_persisted_occurrences, occurrence_pool, self.tzinfo)
 
     def _get_day_range(self, instant):
         """ given a UTC datetime `instant`, returns the start and end datetimes
@@ -302,8 +302,8 @@ class Day(Period):
 
         TODO: assert instant is a timezone-aware datetime.datetime object
         """
-        date = self.tzinfo.normalize(instant.astimezone(self.tzinfo)).date()
-        start = datetime.datetime.combine(date, datetime.time.min).replace(tzinfo=self.tzinfo)
+        start = self.tzinfo.normalize(instant.astimezone(self.tzinfo))\
+                           .replace(hour=0, minute=0, second=0, microsecond=0)
         end = start + datetime.timedelta(days=1)
         return start, end
 
