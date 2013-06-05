@@ -79,6 +79,7 @@ class Event(models.Model):
         app_label = 'schedule'
 
     def __unicode__(self):
+        """ TODO: have this display dates according to TIME_ZONE """
         date_format = u'%s' % ugettext("DATE_FORMAT")
         return ugettext('%(title)s: %(start)s - %(end)s') % {
             'title': self.title,
