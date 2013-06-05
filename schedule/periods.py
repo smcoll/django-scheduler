@@ -164,8 +164,10 @@ class Month(Period):
     and day periods within the date.
     """
     def __init__(self, events, date=None, parent_persisted_occurrences=None,
-        occurrence_pool=None, tzinfo=pytz.utc):
+        occurrence_pool=None, tzinfo=None):
         self.tzinfo = tzinfo
+        if self.tzinfo is None:
+            self.tzinfo = timezone.get_default_timezone()
         if date is None:
             date = timezone.now()
         start, end = self._get_month_range(date)
@@ -283,26 +285,26 @@ class Week(Period):
 
 
 class Day(Period):
-    """ 'instant' argument is a timezone-aware datetime.datetime object """
-    def __init__(self, events, instant=None, parent_persisted_occurrences=None,
+    """ 'date' argument is a timezone-aware datetime.datetime object """
+    def __init__(self, events, date=None, parent_persisted_occurrences=None,
         occurrence_pool=None, tzinfo=None):
         """ todo: make sure datetime is not timezone-naive """
         self.tzinfo = tzinfo
         if self.tzinfo is None:
             self.tzinfo = timezone.get_default_timezone()
-        if instant is None:
-            instant = timezone.now()
-        start, end = self._get_day_range(instant)
+        if date is None:
+            date = timezone.now()
+        start, end = self._get_day_range(date)
         super(Day, self).__init__(events, start, end,
             parent_persisted_occurrences, occurrence_pool, self.tzinfo)
 
-    def _get_day_range(self, instant):
-        """ given a UTC datetime `instant`, returns the start and end datetimes
+    def _get_day_range(self, date):
+        """ given a UTC datetime `date`, returns the start and end datetimes
         for the current day in the relevant timezone (self.tzinfo)
 
-        TODO: assert instant is a timezone-aware datetime.datetime object
+        TODO: assert date is a timezone-aware datetime.datetime object
         """
-        start = self.tzinfo.normalize(instant.astimezone(self.tzinfo))\
+        start = self.tzinfo.normalize(date.astimezone(self.tzinfo))\
                            .replace(hour=0, minute=0, second=0, microsecond=0)
         end = start + datetime.timedelta(days=1)
         return start, end
