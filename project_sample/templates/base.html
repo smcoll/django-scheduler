@@ -21,6 +21,18 @@
     </head>
 
     <body>
+
+<pre>
+    periods: {{ periods }}
+    {% for label, period in periods.items %}
+        {{ label }}: {{ period }}
+        start: {{ period.start }}
+        end: {{ period.end }}
+    {% endfor %}
+
+</pre>
+
+
     <h3 id="demo">This is a demo of a django-schedule calendar</h3>
     <p style="clear:both"/>
 
