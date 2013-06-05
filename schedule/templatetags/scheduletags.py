@@ -47,8 +47,8 @@ def daily_table( context, day, width, width_slot, height, start=8, end=20, incre
       width - width of the table (px)
       width_slot - width of the slot column (px)
       height - height of the table
-      start - hour at which the day starts
-      end - hour at which the day ends
+      start - hour at which the table starts
+      end - hour at which the table ends
       increment - size of a time slot (in minutes)
     """
     user = context['request'].user
