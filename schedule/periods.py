@@ -1,5 +1,6 @@
 import pytz
 import datetime
+
 from django.template.defaultfilters import date
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django.utils.dates import WEEKDAYS, WEEKDAYS_ABBR
@@ -162,6 +163,10 @@ class Month(Period):
     """
     The month period has functions for retrieving the week periods within this period
     and day periods within the date.
+
+    'date' argument should be a timezone-aware datetime.datetime object
+
+    TODO: assert date is a timezone-aware datetime.datetime object
     """
     def __init__(self, events, date=None, parent_persisted_occurrences=None,
         occurrence_pool=None, tzinfo=None):
@@ -206,14 +211,24 @@ class Month(Period):
         start = datetime.datetime.min.replace(year=self.start.year + 1, tzinfo=self.tzinfo)
         return Year(self.events, start)
 
-    def _get_month_range(self, month):
-        year = month.year
-        month = month.month
-        start = datetime.datetime.min.replace(year=year, month=month, tzinfo=self.tzinfo)
+    def _get_month_range(self, instant):
+        if timezone.is_naive(instant):
+            instant = timezone.make_aware(instant, self.tzinfo)
+        start = self.tzinfo.normalize(instant.astimezone(self.tzinfo))\
+                           .replace(hour=0, minute=0, second=0, microsecond=0)
+        month = start.month
+        year = start.year
+        # update value to be first instant of month
+        start = start.replace(day=1)
         if month == 12:
-            end = start.replace(month=1, year=year + 1, tzinfo=self.tzinfo)
+            end = start.replace(month=1, year=year + 1, hour=0, tzinfo=self.tzinfo)
         else:
-            end = start.replace(month=month + 1, tzinfo=self.tzinfo)
+            # end = start.replace(month=month + 1, hour=0, tzinfo=self.tzinfo)
+            end = datetime.datetime(year=start.year,
+                                    month=start.month+1,
+                                    day=1,
+                                    hour=0,
+                                    tzinfo=self.tzinfo)
         return start, end
 
     def __unicode__(self):
@@ -312,8 +327,8 @@ class Day(Period):
     def __unicode__(self):
         date_format = u'l, %s' % ugettext("DATE_FORMAT")
         return ugettext('Day: %(start)s-%(end)s') % {
-            'start': datetime(self.start, date_format),
-            'end': datetime(self.end, date_format),
+            'start': self.start.strftime(date_format),
+            'end': self.end.strftime(date_format),
         }
 
     def prev_day(self):
