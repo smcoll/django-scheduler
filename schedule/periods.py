@@ -5,6 +5,7 @@ from django.utils.translation import ugettext, ugettext_lazy as _
 from django.utils.dates import WEEKDAYS, WEEKDAYS_ABBR
 from schedule.conf.settings import FIRST_DAY_OF_WEEK, SHOW_CANCELLED_OCCURRENCES
 from schedule.models import Occurrence
+from schedule.utils import get_starttime_for_date
 from django.utils import timezone
 
 weekday_names = []
@@ -127,10 +128,13 @@ class Period(object):
 
 
 class Year(Period):
-    def __init__(self, events, date=None, parent_persisted_occurrences=None, tzinfo=pytz.utc):
+    def __init__(self, events, date=None, parent_persisted_occurrences=None, tzinfo=None):
         self.tzinfo = tzinfo
+        if self.tzinfo is None:
+            self.tzinfo = timezone.get_default_timezone()
+        # if no date, use current date for timezone specified by tzinfo
         if date is None:
-            date = timezone.now()
+            date = timezone.now().astimezone(self.tzinfo).date()
         start, end = self._get_year_range(date)
         super(Year, self).__init__(events, start, end, parent_persisted_occurrences)
 
@@ -146,11 +150,17 @@ class Year(Period):
         return Year(self.events, start)
     prev = prev_year
 
-    def _get_year_range(self, year):
-        start = datetime.datetime(year.year, datetime.datetime.min.month,
-            datetime.datetime.min.day, tzinfo=self.tzinfo)
-        end = datetime.datetime(year.year + 1, datetime.datetime.min.month,
-            datetime.datetime.min.day, tzinfo=self.tzinfo)
+    def _get_year_range(self, date):
+        if isinstance(date, datetime.datetime):
+            date = date.date()
+        first_day = datetime.date(year=date.year,
+                                  month=datetime.datetime.min.month,
+                                  day=datetime.datetime.min.day)
+        start = get_starttime_for_date(first_day, self.tzinfo)
+        last_day = datetime.date(year=date.year+1,
+                                 month=datetime.datetime.min.month,
+                                 day=datetime.datetime.min.day)
+        end = get_starttime_for_date(last_day, self.tzinfo)
         return start, end
 
     def __unicode__(self):
@@ -164,10 +174,13 @@ class Month(Period):
     and day periods within the date.
     """
     def __init__(self, events, date=None, parent_persisted_occurrences=None,
-        occurrence_pool=None, tzinfo=pytz.utc):
+        occurrence_pool=None, tzinfo=None):
         self.tzinfo = tzinfo
+        if self.tzinfo is None:
+            self.tzinfo = timezone.get_default_timezone()
+        # if no date, use current date for timezone specified by tzinfo
         if date is None:
-            date = timezone.now()
+            date = timezone.now().astimezone(self.tzinfo).date()
         start, end = self._get_month_range(date)
         super(Month, self).__init__(events, start, end,
             parent_persisted_occurrences, occurrence_pool)
@@ -204,14 +217,25 @@ class Month(Period):
         start = datetime.datetime.min.replace(year=self.start.year + 1, tzinfo=self.tzinfo)
         return Year(self.events, start)
 
-    def _get_month_range(self, month):
-        year = month.year
-        month = month.month
-        start = datetime.datetime.min.replace(year=year, month=month, tzinfo=self.tzinfo)
-        if month == 12:
-            end = start.replace(month=1, year=year + 1, tzinfo=self.tzinfo)
+    def _get_month_range(self, date):
+        """ given a naive datetime.date or datetime.datetime, return 'start'
+        and 'end' timezone-aware datetime.datetimes representing the
+        beginning and end of that month, for the relevant timezone
+        """
+        first_day = datetime.date(year=date.year,
+                                  month=date.month,
+                                  day=datetime.datetime.min.day)
+        start = get_starttime_for_date(first_day, self.tzinfo)
+        if start.month == 12:
+            last_day = datetime.date(year=date.year+1,
+                                     month=datetime.datetime.min.month,
+                                     day=datetime.datetime.min.day)
+            end = get_starttime_for_date(last_day, self.tzinfo)
         else:
-            end = start.replace(month=month + 1, tzinfo=self.tzinfo)
+            last_day = datetime.date(year=date.year,
+                                     month=date.month+1,
+                                     day=datetime.datetime.min.day)
+            end = get_starttime_for_date(last_day, self.tzinfo)
         return start, end
 
     def __unicode__(self):
@@ -229,10 +253,13 @@ class Week(Period):
     The Week period that has functions for retrieving Day periods within it
     """
     def __init__(self, events, date=None, parent_persisted_occurrences=None,
-        occurrence_pool=None, tzinfo=pytz.utc):
+        occurrence_pool=None, tzinfo=None):
         self.tzinfo = tzinfo
+        if self.tzinfo is None:
+            self.tzinfo = timezone.get_default_timezone()
+        # if no date, use current date for timezone specified by tzinfo
         if date is None:
-            date = timezone.now()
+            date = timezone.now().astimezone(self.tzinfo).date()
         start, end = self._get_week_range(date)
         super(Week, self).__init__(events, start, end,
             parent_persisted_occurrences, occurrence_pool)
@@ -254,11 +281,11 @@ class Week(Period):
     def get_days(self):
         return self.get_periods(Day)
 
-    def _get_week_range(self, week):
-        if isinstance(week, datetime.datetime):
-            week = week.date()
-        # Adjust the start datetime to midnight of the week datetime
-        start = datetime.datetime.combine(week, datetime.time.min).replace(tzinfo=self.tzinfo)
+    def _get_week_range(self, date):
+        if isinstance(date, datetime.datetime):
+            date = date.date()
+        first_day = datetime.date(year=date.year, month=date.month, day=date.day)
+        start = get_starttime_for_date(first_day, self.tzinfo)
         # Adjust the start datetime to Monday or Sunday of the current week
         sub_days = 0
         if FIRST_DAY_OF_WEEK == 1:
@@ -284,10 +311,13 @@ class Week(Period):
 
 class Day(Period):
     def __init__(self, events, date=None, parent_persisted_occurrences=None,
-        occurrence_pool=None, tzinfo=pytz.utc):
+        occurrence_pool=None, tzinfo=None):
         self.tzinfo = tzinfo
+        if self.tzinfo is None:
+            self.tzinfo = timezone.get_default_timezone()
+        # if no date, use current date for timezone specified by tzinfo
         if date is None:
-            date = timezone.now()
+            date = timezone.now().astimezone(self.tzinfo).date()
         start, end = self._get_day_range(date)
         super(Day, self).__init__(events, start, end,
             parent_persisted_occurrences, occurrence_pool)
@@ -295,7 +325,8 @@ class Day(Period):
     def _get_day_range(self, date):
         if isinstance(date, datetime.datetime):
             date = date.date()
-        start = datetime.datetime.combine(date, datetime.time.min).replace(tzinfo=self.tzinfo)
+        first_day = datetime.date(year=date.year, month=date.month, day=date.day)
+        start = get_starttime_for_date(first_day, self.tzinfo)
         end = start + datetime.timedelta(days=1)
         return start, end
 
@@ -322,4 +353,3 @@ class Day(Period):
 
     def current_week(self):
         return Week(self.events, self.start)
-
