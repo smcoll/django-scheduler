@@ -222,13 +222,19 @@ class Month(Period):
         and 'end' timezone-aware datetime.datetimes representing the
         beginning and end of that month, for the relevant timezone
         """
-        first_day = datetime.date(year=date.year, month=date.month, day=1)
+        first_day = datetime.date(year=date.year,
+                                  month=date.month,
+                                  day=datetime.datetime.min.day)
         start = get_starttime_for_date(first_day, self.tzinfo)
         if start.month == 12:
-            last_day = datetime.date(year=date.year+1, month=1, day=1)
+            last_day = datetime.date(year=date.year+1,
+                                     month=datetime.datetime.min.month,
+                                     day=datetime.datetime.min.day)
             end = get_starttime_for_date(last_day, self.tzinfo)
         else:
-            last_day = datetime.date(year=date.year, month=date.month+1, day=1)
+            last_day = datetime.date(year=date.year,
+                                     month=date.month+1,
+                                     day=datetime.datetime.min.day)
             end = get_starttime_for_date(last_day, self.tzinfo)
         return start, end
 
@@ -347,4 +353,3 @@ class Day(Period):
 
     def current_week(self):
         return Week(self.events, self.start)
-
