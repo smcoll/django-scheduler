@@ -33,7 +33,7 @@ def calendar(request, calendar_slug, template='schedule/calendar.html'):
     }, context_instance=RequestContext(request))
 
 def calendar_by_periods(request, calendar_slug, periods=None,
-    template_name="schedule/calendar_by_period.html"):
+    template_name="schedule/calendar_by_period.html", tzinfo=None):
     """
     This view is for getting a calendar, but also getting periods with that
     calendar.  Which periods you get, is designated with the list periods. You
@@ -68,13 +68,16 @@ def calendar_by_periods(request, calendar_slug, periods=None,
     """
     calendar = get_object_or_404(Calendar, slug=calendar_slug)
     date = coerce_date_dict(request.GET)
+    if tzinfo is None:
+        tzinfo = timezone.get_default_timezone()
+    # if no date, use current date for timezone specified by tzinfo
     if date:
         try:
             date = datetime.datetime(**date)
         except ValueError:
             raise Http404
     else:
-        date = timezone.now()
+        date = timezone.now().astimezone(tzinfo).date()
     event_list = GET_EVENTS_FUNC(request, calendar)
     period_objects = dict([(period.__name__.lower(), period(event_list, date)) for period in periods])
     return render_to_response(template_name,{

@@ -1,3 +1,4 @@
+import datetime
 import pytz
 import heapq
 from django.contrib.contenttypes.models import ContentType
@@ -124,3 +125,12 @@ def coerce_date_dict(date_dict):
             break
     return modified and retVal or {}
 
+
+def get_starttime_for_date(date, tzinfo=None):
+    """ Given a datetime.date, return a datetime.datetime for the first instant
+    on that day, assuming the given timezone.  If no timezone is provided,
+    a timezone from settings.TIME_ZONE is used.
+    """
+    if tzinfo is None:
+        tzinfo = timezone.get_default_timezone()
+    return datetime.datetime(date.year, date.month, date.day, 0, 0, 0, tzinfo=tzinfo)

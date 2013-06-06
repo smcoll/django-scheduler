@@ -5,6 +5,7 @@ from django.utils.translation import ugettext, ugettext_lazy as _
 from django.utils.dates import WEEKDAYS, WEEKDAYS_ABBR
 from schedule.conf.settings import FIRST_DAY_OF_WEEK, SHOW_CANCELLED_OCCURRENCES
 from schedule.models import Occurrence
+from schedule.utils import get_starttime_for_date
 from django.utils import timezone
 
 weekday_names = []
@@ -164,10 +165,13 @@ class Month(Period):
     and day periods within the date.
     """
     def __init__(self, events, date=None, parent_persisted_occurrences=None,
-        occurrence_pool=None, tzinfo=pytz.utc):
+        occurrence_pool=None, tzinfo=None):
         self.tzinfo = tzinfo
+        if self.tzinfo is None:
+            self.tzinfo = timezone.get_default_timezone()
+        # if no date, use current date for timezone specified by tzinfo
         if date is None:
-            date = timezone.now()
+            date = timezone.now().astimezone(self.tzinfo).date()
         start, end = self._get_month_range(date)
         super(Month, self).__init__(events, start, end,
             parent_persisted_occurrences, occurrence_pool)
@@ -204,14 +208,19 @@ class Month(Period):
         start = datetime.datetime.min.replace(year=self.start.year + 1, tzinfo=self.tzinfo)
         return Year(self.events, start)
 
-    def _get_month_range(self, month):
-        year = month.year
-        month = month.month
-        start = datetime.datetime.min.replace(year=year, month=month, tzinfo=self.tzinfo)
-        if month == 12:
-            end = start.replace(month=1, year=year + 1, tzinfo=self.tzinfo)
+    def _get_month_range(self, date):
+        """ given a naive datetime.date or datetime.datetime, return 'start'
+        and 'end' timezone-aware datetime.datetimes representing the
+        beginning and end of that month, for the relevant timezone
+        """
+        first_day = datetime.date(year=date.year, month=date.month, day=1)
+        start = get_starttime_for_date(first_day, self.tzinfo)
+        if start.month == 12:
+            last_day = datetime.date(year=date.year+1, month=1, day=1)
+            end = get_starttime_for_date(last_day, self.tzinfo)
         else:
-            end = start.replace(month=month + 1, tzinfo=self.tzinfo)
+            last_day = datetime.date(year=date.year, month=date.month+1, day=1)
+            end = get_starttime_for_date(last_day, self.tzinfo)
         return start, end
 
     def __unicode__(self):
