@@ -137,4 +137,5 @@ def get_starttime_for_date(date, tzinfo=None):
         date = date.date()
     if tzinfo is None:
         tzinfo = timezone.get_default_timezone()
-    return datetime.datetime(date.year, date.month, date.day, 0, 0, 0, tzinfo=tzinfo)
+    naive_start_dt = datetime.datetime.combine(date, datetime.time.min)
+    return tzinfo.localize(naive_start_dt)
