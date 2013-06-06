@@ -238,10 +238,13 @@ class Week(Period):
     The Week period that has functions for retrieving Day periods within it
     """
     def __init__(self, events, date=None, parent_persisted_occurrences=None,
-        occurrence_pool=None, tzinfo=pytz.utc):
+        occurrence_pool=None, tzinfo=None):
         self.tzinfo = tzinfo
+        if self.tzinfo is None:
+            self.tzinfo = timezone.get_default_timezone()
+        # if no date, use current date for timezone specified by tzinfo
         if date is None:
-            date = timezone.now()
+            date = timezone.now().astimezone(self.tzinfo).date()
         start, end = self._get_week_range(date)
         super(Week, self).__init__(events, start, end,
             parent_persisted_occurrences, occurrence_pool)
@@ -263,11 +266,11 @@ class Week(Period):
     def get_days(self):
         return self.get_periods(Day)
 
-    def _get_week_range(self, week):
-        if isinstance(week, datetime.datetime):
-            week = week.date()
-        # Adjust the start datetime to midnight of the week datetime
-        start = datetime.datetime.combine(week, datetime.time.min).replace(tzinfo=self.tzinfo)
+    def _get_week_range(self, date):
+        if isinstance(date, datetime.datetime):
+            date = date.date()
+        first_day = datetime.date(year=date.year, month=date.month, day=date.day)
+        start = get_starttime_for_date(first_day, self.tzinfo)
         # Adjust the start datetime to Monday or Sunday of the current week
         sub_days = 0
         if FIRST_DAY_OF_WEEK == 1:
