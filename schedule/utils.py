@@ -131,6 +131,9 @@ def get_starttime_for_date(date, tzinfo=None):
     on that day, assuming the given timezone.  If no timezone is provided,
     a timezone from settings.TIME_ZONE is used.
     """
+    if isinstance(date, datetime.datetime):
+        date = date.date()
     if tzinfo is None:
         tzinfo = timezone.get_default_timezone()
-    return datetime.datetime(date.year, date.month, date.day, 0, 0, 0, tzinfo=tzinfo)
+    naive_start_dt = datetime.datetime.combine(date, datetime.time.min)
+    return tzinfo.localize(naive_start_dt)
