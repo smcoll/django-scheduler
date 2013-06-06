@@ -128,10 +128,13 @@ class Period(object):
 
 
 class Year(Period):
-    def __init__(self, events, date=None, parent_persisted_occurrences=None, tzinfo=pytz.utc):
+    def __init__(self, events, date=None, parent_persisted_occurrences=None, tzinfo=None):
         self.tzinfo = tzinfo
+        if self.tzinfo is None:
+            self.tzinfo = timezone.get_default_timezone()
+        # if no date, use current date for timezone specified by tzinfo
         if date is None:
-            date = timezone.now()
+            date = timezone.now().astimezone(self.tzinfo).date()
         start, end = self._get_year_range(date)
         super(Year, self).__init__(events, start, end, parent_persisted_occurrences)
 
@@ -147,11 +150,17 @@ class Year(Period):
         return Year(self.events, start)
     prev = prev_year
 
-    def _get_year_range(self, year):
-        start = datetime.datetime(year.year, datetime.datetime.min.month,
-            datetime.datetime.min.day, tzinfo=self.tzinfo)
-        end = datetime.datetime(year.year + 1, datetime.datetime.min.month,
-            datetime.datetime.min.day, tzinfo=self.tzinfo)
+    def _get_year_range(self, date):
+        if isinstance(date, datetime.datetime):
+            date = date.date()
+        first_day = datetime.date(year=date.year,
+                                  month=datetime.datetime.min.month,
+                                  day=datetime.datetime.min.day)
+        start = get_starttime_for_date(first_day, self.tzinfo)
+        last_day = datetime.date(year=date.year,
+                                 month=datetime.datetime.min.month,
+                                 day=datetime.datetime.min.day)
+        end = get_starttime_for_date(last_day, self.tzinfo)
         return start, end
 
     def __unicode__(self):
