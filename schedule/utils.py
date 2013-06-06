@@ -130,8 +130,6 @@ def get_starttime_for_date(date, tzinfo=None):
     """ Given a datetime.date, return a datetime.datetime for the first instant
     on that day, assuming the given timezone.  If no timezone is provided,
     a timezone from settings.TIME_ZONE is used.
-
-    TODO: fix support for DST.  Presently, during DST, this datetime starts at 1am
     """
     if isinstance(date, datetime.datetime):
         date = date.date()
