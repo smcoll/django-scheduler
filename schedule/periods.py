@@ -157,7 +157,7 @@ class Year(Period):
                                   month=datetime.datetime.min.month,
                                   day=datetime.datetime.min.day)
         start = get_starttime_for_date(first_day, self.tzinfo)
-        last_day = datetime.date(year=date.year,
+        last_day = datetime.date(year=date.year+1,
                                  month=datetime.datetime.min.month,
                                  day=datetime.datetime.min.day)
         end = get_starttime_for_date(last_day, self.tzinfo)
