@@ -13,6 +13,11 @@ class EventCategoryAdmin(admin.ModelAdmin):
     search_fields = ['name']
 
 
+class EventAdminOptions(admin.ModelAdmin):
+    prepopulated_fields = {"slug": ("title",)}
+
+
 admin.site.register(Calendar, CalendarAdminOptions)
+admin.site.register(Event, EventAdminOptions)
 admin.site.register(EventCategory, EventCategoryAdmin)
-admin.site.register([Rule, Event, CalendarRelation])
+admin.site.register([Rule, CalendarRelation])

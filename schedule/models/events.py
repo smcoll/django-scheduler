@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import pytz
-import datetime
 from dateutil import rrule
 
 from django.contrib.contenttypes import generic
@@ -11,12 +10,12 @@ from django.contrib.localflavor.us.models import PhoneNumberField
 from django.core.urlresolvers import reverse
 from django.template.defaultfilters import date
 from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils import timezone
 
 from schedule.conf import settings
 from schedule.models.rules import Rule
 from schedule.models.calendars import Calendar
 from schedule.utils import OccurrenceReplacer
-from django.utils import timezone
 
 class EventManager(models.Manager):
 
@@ -50,6 +49,7 @@ class Event(models.Model):
     end = models.DateTimeField(_("end"),
                                help_text=_("The end time must be later than the start time."))
     title = models.CharField(_("title"), max_length=255)
+    slug = models.SlugField(_("slug"), max_length=200, unique=False)
     description = models.TextField(_("description"), null=True, blank=True)
     creator = models.ForeignKey(settings.AUTH_USER_MODEL, null=True,
                                 blank=True, verbose_name=_("creator"),
@@ -95,7 +95,7 @@ class Event(models.Model):
 
 
     def get_absolute_url(self):
-        return reverse('event', args=[self.id])
+        return reverse('event', args=[self.slug])
 
     def create_relation(self, obj, distinction=None):
         """
@@ -144,8 +144,8 @@ class Event(models.Model):
     def get_rrule_object(self):
         if self.rule is not None:
             params = self.rule.get_params()
-            frequency = 'rrule.%s' % self.rule.frequency
-            return rrule.rrule(eval(frequency), dtstart=self.start, **params)
+            frequency = self.rule.rrule_frequency()
+            return rrule.rrule(frequency, dtstart=self.start, **params)
 
     def _create_occurrence(self, start, end=None):
         if end is None:
@@ -435,9 +435,9 @@ class Occurrence(models.Model):
     def get_absolute_url(self):
         if self.pk is not None:
             return reverse('occurrence', kwargs={'occurrence_id': self.pk,
-                'event_id': self.event.id})
+                'event_slug': self.event.slug})
         return reverse('occurrence_by_date', kwargs={
-            'event_id': self.event.id,
+            'event_slug': self.event.slug,
             'year': self.start.year,
             'month': self.start.month,
             'day': self.start.day,
@@ -449,9 +449,9 @@ class Occurrence(models.Model):
     def get_cancel_url(self):
         if self.pk is not None:
             return reverse('cancel_occurrence', kwargs={'occurrence_id': self.pk,
-                'event_id': self.event.id})
+                'event_slug': self.event.slug})
         return reverse('cancel_occurrence_by_date', kwargs={
-            'event_id': self.event.id,
+            'event_slug': self.event.slug,
             'year': self.start.year,
             'month': self.start.month,
             'day': self.start.day,
@@ -463,9 +463,9 @@ class Occurrence(models.Model):
     def get_edit_url(self):
         if self.pk is not None:
             return reverse('edit_occurrence', kwargs={'occurrence_id': self.pk,
-                'event_id': self.event.id})
+                'event_slug': self.event.slug})
         return reverse('edit_occurrence_by_date', kwargs={
-            'event_id': self.event.id,
+            'event_slug': self.event.slug,
             'year': self.start.year,
             'month': self.start.month,
             'day': self.start.day,

@@ -89,9 +89,9 @@ class check_event_permissions(object):
 
     def __call__(self, request, *args, **kwargs):
         user = request.user
-        object_id = kwargs.get('event_id', None)
+        object_slug = kwargs.get('event_slug', None)
         try:
-            obj = self.contenttype.get_object_for_this_type(pk=object_id)
+            obj = self.contenttype.get_object_for_this_type(slug=object_slug)
         except self.contenttype.model_class().DoesNotExist:
             obj = None
         allowed = CHECK_PERMISSION_FUNC(obj, user)
