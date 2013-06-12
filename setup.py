@@ -15,6 +15,7 @@ setup(
         'schedule.feeds',
         'schedule.management',
         'schedule.management.commands',
+        'schedule.migrations',
         'schedule.models',
         'schedule.templatetags',
         'schedule.tests',
