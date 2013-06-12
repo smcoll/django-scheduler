@@ -11,7 +11,7 @@ class Migration(DataMigration):
         from django.utils.text import slugify
 
         for event in orm.Event.objects.all():
-            slug = slugify(event.name)
+            slug = slugify(event.title)
             count = orm.Event.objects.filter(slug__startswith=slug).count()
             if count > 0:
                 slug = '%s-%d' % (slug, count)
