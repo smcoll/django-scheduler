@@ -49,7 +49,7 @@ class Event(models.Model):
     end = models.DateTimeField(_("end"),
                                help_text=_("The end time must be later than the start time."))
     title = models.CharField(_("title"), max_length=255)
-    slug = models.SlugField(_("slug"), max_length=200, unique=False)
+    slug = models.SlugField(_("slug"), max_length=200)
     description = models.TextField(_("description"), null=True, blank=True)
     creator = models.ForeignKey(settings.AUTH_USER_MODEL, null=True,
                                 blank=True, verbose_name=_("creator"),
