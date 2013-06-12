@@ -30,6 +30,7 @@ class Event(models.Model):
     start = models.DateTimeField(_("start"))
     end = models.DateTimeField(_("end"),help_text=_("The end time must be later than the start time."))
     title = models.CharField(_("title"), max_length = 255)
+    slug = models.SlugField(_("slug"), max_length=200)
     description = models.TextField(_("description"), null = True, blank = True)
     creator = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, verbose_name=_("creator"), related_name='creator')
     created_on = models.DateTimeField(_("created on"), default = timezone.now)
@@ -53,7 +54,7 @@ class Event(models.Model):
 
 
     def get_absolute_url(self):
-        return reverse('event', args=[self.id])
+        return reverse('event', args=[self.slug])
 
     def create_relation(self, obj, distinction = None):
         """
@@ -393,9 +394,9 @@ class Occurrence(models.Model):
     def get_absolute_url(self):
         if self.pk is not None:
             return reverse('occurrence', kwargs={'occurrence_id': self.pk,
-                'event_id': self.event.id})
+                'event_slug': self.event.slug})
         return reverse('occurrence_by_date', kwargs={
-            'event_id': self.event.id,
+            'event_slug': self.event.slug,
             'year': self.start.year,
             'month': self.start.month,
             'day': self.start.day,
@@ -407,9 +408,9 @@ class Occurrence(models.Model):
     def get_cancel_url(self):
         if self.pk is not None:
             return reverse('cancel_occurrence', kwargs={'occurrence_id': self.pk,
-                'event_id': self.event.id})
+                'event_slug': self.event.slug})
         return reverse('cancel_occurrence_by_date', kwargs={
-            'event_id': self.event.id,
+            'event_slug': self.event.slug,
             'year': self.start.year,
             'month': self.start.month,
             'day': self.start.day,
@@ -421,9 +422,9 @@ class Occurrence(models.Model):
     def get_edit_url(self):
         if self.pk is not None:
             return reverse('edit_occurrence', kwargs={'occurrence_id': self.pk,
-                'event_id': self.event.id})
+                'event_slug': self.event.slug})
         return reverse('edit_occurrence_by_date', kwargs={
-            'event_id': self.event.id,
+            'event_slug': self.event.slug,
             'year': self.start.year,
             'month': self.start.month,
             'day': self.start.day,
