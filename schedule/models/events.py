@@ -29,7 +29,7 @@ class EventCategory(models.Model):
 
     '''
     name = models.CharField(_("name"), max_length=200)
-    slug = models.SlugField(_("slug"))
+    slug = models.SlugField(_("slug"), unique=True)
 
     class Meta:
         app_label = 'schedule'
