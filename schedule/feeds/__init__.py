@@ -1,5 +1,6 @@
 import datetime, itertools
 
+from django.contrib.sites.models import Site
 from django.contrib.syndication.views import FeedDoesNotExist
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
@@ -51,17 +52,15 @@ class UpcomingEventsFeed(Feed):
 
 
 class CalendarICalendar(ICalendarFeed):
-    """ TODO: add support for RRULE, and use event rather than occurrence """
 
     def items(self):
         cal_id = self.args[1]
         cal = Calendar.objects.get(pk=cal_id)
 
-        # return cal.events.all()
-        return cal.occurrences_after()
+        return cal.events.all()
 
     def item_uid(self, item):
-        return item.get_absolute_url()
+        return item.slug
 
     def item_start(self, item):
         return item.start
@@ -73,27 +72,54 @@ class CalendarICalendar(ICalendarFeed):
         return item.title
 
     def item_created(self, item):
-        return item.event.created_on
+        return item.created_on
 
     def item_description(self, item):
-        return item.event.description
+        return item.description
 
     def item_location(self, item):
         attr_list = ['venue_name', 'address']
-        contact_details = [getattr(item.event, x) for x in attr_list if getattr(item.event, x) != '']
+        contact_details = [getattr(item, x) for x in attr_list if getattr(item, x) != '']
         return u'; '.join(contact_details)
 
     def item_url(self, item):
-        # TODO: get full path including domain
-        return item.get_absolute_url()
+        """ Return full url including domain """
+        current_site = Site.objects.get_current()
+        return u'%s%s' % (current_site.domain, item.get_absolute_url())
 
     def item_description(self, item):
         return strip_tags(item.description)
 
     def item_contact(self, item):
         attr_list = ['contact', 'phone_number', 'email', 'url']
-        contact_details = [getattr(item.event, x) for x in attr_list if getattr(item.event, x) != '']
+        contact_details = [getattr(item, x) for x in attr_list if getattr(item, x) != '']
         return u'; '.join(contact_details)
 
     def item_x_cost(self, item):
-        return item.event.cost
+        return item.cost
+
+    def item_rrule(self, item):
+        """ Examples:
+
+            RRULE:FREQ=YEARLY;BYMONTH=2
+
+            RRULE:FREQ=MONTHLY;UNTIL=20121130T235959Z;BYDAY=4SA
+            RRULE:FREQ=MONTHLY;BYDAY=4FR
+
+            RRULE:FREQ=WEEKLY;UNTIL=20120417T235959Z;BYDAY=TU;WKST=MO
+            RRULE:FREQ=WEEKLY;BYDAY=WE;WKST=MO
+            RRULE:FREQ=WEEKLY;COUNT=4;BYDAY=SA;WKST=MO
+
+            RRULE:FREQ=DAILY;COUNT=3
+            RRULE:FREQ=DAILY;UNTIL=20120103;BYDAY=SU
+
+        TODO: add support for Rule.params
+        """
+        if item.rule:
+            rrule_str = 'FREQ=%s' % (item.rule.frequency)
+            if item.end_recurring_period:
+                rrule_str = u'%s;UNTIL=%s' % (rrule_str, item.end_recurring_period.strftime('%Y%m%dT%H%M%SZ'))
+            return rrule_str
+        else:
+            return ''
+        return 'FREQ=YEARLY;BYMONTH=2'

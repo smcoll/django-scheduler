@@ -11,7 +11,7 @@ EVENT_ITEMS = (
     ('dtstart', 'start'),
     ('dtend', 'end'),
     ('location', 'location'),
-    # ('rrule', 'rrule'),
+    ('rrule', 'rrule'),
     ('summary', 'summary'),
     ('url', 'url'),
     ('x_cost', 'x_cost'),
@@ -75,4 +75,7 @@ class ICalendarFeed(object):
         pass
 
     def item_x_cost(self, item):
+        pass
+
+    def item_rrule(self, item):
         pass
