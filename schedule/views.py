@@ -115,16 +115,15 @@ def event(request, event_slug, template_name="schedule/event.html"):
         this is the url that referred to this view.
     """
     event = get_object_or_404(Event, slug=event_slug)
-    #back_url = request.META.get('HTTP_REFERER', None)
+    back_url = request.META.get('HTTP_REFERER', None)
     try:
         cal = event.calendar_set.get()
     except:
         cal = None
     return render(request, template_name, {
         "event": event,
-        "back_url" : None,
-    })
-    #, context_instance=RequestContext(request))
+        "back_url" : back_url,
+    }, context_instance=RequestContext(request))
 
 def occurrence(request, event_slug,
     template_name="schedule/occurrence.html", *args, **kwargs):
