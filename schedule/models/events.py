@@ -63,6 +63,7 @@ class Event(models.Model):
                                                 help_text=_("This date is ignored for one time only events."))
     calendar = models.ForeignKey(Calendar, null=True, blank=True)
     category = models.ForeignKey(EventCategory, null=True, blank=True)
+    featured = models.BooleanField(default=False)
 
     # location
     venue_name = models.CharField(_('venue name'), max_length=100, blank=True)
