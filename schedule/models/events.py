@@ -64,6 +64,7 @@ class Event(models.Model):
     calendar = models.ForeignKey(Calendar, null=True, blank=True)
     category = models.ForeignKey(EventCategory, null=True, blank=True)
     featured = models.BooleanField(default=False)
+    image = models.ImageField(_('image'), null=True, blank=True, upload_to=settings.SCHEDULE_UPLOAD_TO)
 
     # location
     venue_name = models.CharField(_('venue name'), max_length=100, blank=True)

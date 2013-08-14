@@ -1,5 +1,11 @@
 # Django settings for paquetin project.
 import os
+import sys
+
+def rel(*x):
+    return os.path.join(os.path.abspath(os.path.dirname(__file__)), *x)
+
+sys.path.insert(0, rel('../'))
 
 PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
 
@@ -129,9 +135,10 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
-    'schedule'
+    'schedule',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
+    'south',
 )
 TEMPLATE_CONTEXT_PROCESSORS = (
         'django.contrib.auth.context_processors.auth',
