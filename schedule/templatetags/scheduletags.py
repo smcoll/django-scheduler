@@ -297,6 +297,14 @@ def _cook_slots(period, increment, width, height):
         s = s + tdiff
     return slots
 
+
 @register.simple_tag
 def hash_occurrence(occ):
     return '%s_%s' % (occ.start.strftime('%Y%m%d%H%M%S'), occ.event.id)
+
+
+@register.assignment_tag(takes_context=True)
+def get_featured_events(context):
+    """ Add a list of featured Events to the context """
+    events = Event.objects.filter(featured=True)
+    return events
