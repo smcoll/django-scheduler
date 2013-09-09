@@ -54,7 +54,8 @@ class Event(models.Model):
     creator = models.ForeignKey(settings.AUTH_USER_MODEL, null=True,
                                 blank=True, verbose_name=_("creator"),
                                 related_name='creator')
-    created_on = models.DateTimeField(_("created on"), default=timezone.now)
+    created_on = models.DateTimeField(_("created on"), auto_now_add=True)
+    updated_on = models.DateTimeField(_("updated on"), auto_now=True)
     rule = models.ForeignKey(Rule, null=True, blank=True,
                              verbose_name=_("rule"),
                              help_text=_("Select '----' for a one time only event."))
@@ -83,7 +84,7 @@ class Event(models.Model):
     objects = EventManager()
 
     class Meta:
-        get_latest_by = 'created_on'
+        get_latest_by = 'updated_on'
         verbose_name = _('event')
         verbose_name_plural = _('events')
         app_label = 'schedule'

@@ -45,7 +45,7 @@ class UpcomingEventsFeed(Feed):
         return [{"name": item.event.creator.username}]
 
     def item_updated(self, item):
-        return item.event.created_on
+        return item.event.updated_on
 
     def item_content(self, item):
         return "%s \n %s" % (item.event.title, item.event.description)
