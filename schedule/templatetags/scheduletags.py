@@ -306,5 +306,5 @@ def hash_occurrence(occ):
 @register.assignment_tag(takes_context=True)
 def get_featured_events(context):
     """ Add a list of featured Events to the context """
-    events = Event.objects.filter(featured=True)
+    events = Event.objects.filter(featured=True).order_by('-updated_on')
     return events
