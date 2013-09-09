@@ -84,7 +84,7 @@ class Event(models.Model):
     objects = EventManager()
 
     class Meta:
-        get_latest_by = 'updated_on'
+        get_latest_by = 'created_on'
         verbose_name = _('event')
         verbose_name_plural = _('events')
         app_label = 'schedule'
