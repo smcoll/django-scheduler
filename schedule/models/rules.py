@@ -1,13 +1,16 @@
-from django.db import models
-from django.utils.translation import ugettext, ugettext_lazy as _
+from dateutil.rrule import DAILY, MONTHLY, WEEKLY, YEARLY, HOURLY, MINUTELY, SECONDLY
 
-freqs = (   ("YEARLY", _("Yearly")),
-            ("MONTHLY", _("Monthly")),
-            ("WEEKLY", _("Weekly")),
-            ("DAILY", _("Daily")),
-            ("HOURLY", _("Hourly")),
-            ("MINUTELY", _("Minutely")),
-            ("SECONDLY", _("Secondly")))
+from django.db import models
+from django.utils.translation import ugettext_lazy as _
+
+freqs = (("YEARLY", _("Yearly")),
+         ("MONTHLY", _("Monthly")),
+         ("WEEKLY", _("Weekly")),
+         ("DAILY", _("Daily")),
+         ("HOURLY", _("Hourly")),
+         ("MINUTELY", _("Minutely")),
+         ("SECONDLY", _("Secondly")))
+
 
 class Rule(models.Model):
     """
@@ -47,6 +50,18 @@ class Rule(models.Model):
         verbose_name = _('rule')
         verbose_name_plural = _('rules')
         app_label = 'schedule'
+
+    def rrule_frequency(self):
+        compatibiliy_dict = {
+                'DAILY': DAILY,
+                'MONTHLY': MONTHLY,
+                'WEEKLY': WEEKLY,
+                'YEARLY': YEARLY,
+                'HOURLY': HOURLY,
+                'MINUTELY': MINUTELY,
+                'SECONDLY': SECONDLY
+                }
+        return compatibiliy_dict[self.frequency]
 
     def get_params(self):
         """

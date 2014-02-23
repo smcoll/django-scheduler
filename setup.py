@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from setuptools import setup, find_packages
+from setuptools import setup
 
 setup(
-    name='django-schedule',
-    version='0.6.1',
+    name='django-scheduler',
+    version='0.7.1',
     description='A calendaring app for Django.',
-    author='Anthony Robert Hauber',
-    author_email='thauber@gmail.com',
-    url='http://github.com/thauber/django-schedule/tree/master',
+    author='Leonardo Lazzaro',
+    author_email='lazzaroleonardo@gmail.com',
+    url='https://github.com/llazzaro/django-scheduler',
     packages=[
         'schedule',
         'schedule.conf',
@@ -16,6 +16,7 @@ setup(
         'schedule.management',
         'schedule.management.commands',
         'schedule.models',
+        'schedule.migrations',
         'schedule.templatetags',
         'schedule.tests',
     ],
@@ -29,7 +30,17 @@ setup(
                  'Operating System :: OS Independent',
                  'Programming Language :: Python',
                  'Topic :: Utilities'],
-    install_requires=['vobject', 'python-dateutil'],
+    install_requires=[
+        'Django>=1.5',
+        'argparse>=1.2.1',
+        'python-dateutil>=2.1',
+        'pytz>=2013.9',
+        'six>=1.3.0',
+        'vobject>=0.8.1c',
+        'South==0.8.4',
+        'django-annoying==0.7.9',
+        'coverage==3.6',
+    ],
     license='BSD',
-    test_suite = "schedule.tests",
+    test_suite="schedule.tests",
 )
