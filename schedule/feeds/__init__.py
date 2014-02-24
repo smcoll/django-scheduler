@@ -1,14 +1,13 @@
-import datetime, itertools
+import itertools
 
 from django.contrib.sites.models import Site
-from django.contrib.syndication.views import FeedDoesNotExist
+from django.contrib.syndication.views import Feed, FeedDoesNotExist
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
-from django.http import HttpResponse
 from django.utils import timezone
+
 from django.utils.html import strip_tags
 
-from schedule.feeds.atom import Feed
 from schedule.feeds.icalendar import ICalendarFeed
 from schedule.models import Calendar
 
@@ -19,7 +18,7 @@ class UpcomingEventsFeed(Feed):
     def feed_title(self, obj):
         return "Upcoming Events for %s" % obj.name
 
-    def get_object(self, bits):
+    def get_object(self, request, bits):
         if len(bits) != 1:
             raise ObjectDoesNotExist
         return Calendar.objects.get(pk=bits[0])
@@ -75,7 +74,7 @@ class CalendarICalendar(ICalendarFeed):
         return item.created_on
 
     def item_description(self, item):
-        return item.description
+        return strip_tags(item.description)
 
     def item_location(self, item):
         attr_list = ['venue_name', 'address']
@@ -86,9 +85,6 @@ class CalendarICalendar(ICalendarFeed):
         """ Return full url including domain """
         current_site = Site.objects.get_current()
         return u'%s%s' % (current_site.domain, item.get_absolute_url())
-
-    def item_description(self, item):
-        return strip_tags(item.description)
 
     def item_contact(self, item):
         attr_list = ['contact', 'phone_number', 'email', 'url']

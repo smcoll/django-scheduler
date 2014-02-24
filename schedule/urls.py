@@ -1,9 +1,13 @@
-from django.conf.urls.defaults import *
+try:
+    from django.conf.urls import patterns, url, include
+except ImportError:
+    from django.conf.urls.defaults import patterns, url, include
 from django.views.generic.list import ListView
 from schedule.models import Calendar
 from schedule.feeds import UpcomingEventsFeed
 from schedule.feeds import CalendarICalendar
 from schedule.periods import Year, Month, Week, Day
+from schedule.views import DeleteEventView
 
 info_dict = {
     'queryset': Calendar.objects.all(),
@@ -62,8 +66,8 @@ url(r'^event/edit/(?P<calendar_slug>[-\w]+)/(?P<event_slug>[-\w]+)/$',
 url(r'^event/(?P<event_slug>[-\w]+)/$',
     'schedule.views.event',
     name="event"),
-url(r'^event/delete/(?P<event_slug>[-\w]+)/$',
-    'schedule.views.delete_event',
+url(r'^event/delete/(?P<event_id>\d+)/$',
+    DeleteEventView.as_view(),
     name="delete_event"),
 
 #urls for already persisted occurrences
@@ -88,13 +92,9 @@ url(r'^occurrence/edit/(?P<event_slug>[-\w]+)/(?P<year>\d+)/(?P<month>\d+)/(?P<d
     'schedule.views.edit_occurrence',
     name="edit_occurrence_by_date"),
 
-
 #feed urls
-url(r'^feed/calendar/(.*)/$',
-    'django.contrib.syndication.views.Feed',
-    { "feed_dict": { "upcoming": UpcomingEventsFeed } }),
+url(r'^feed/calendar/upcoming/(.*)/$', UpcomingEventsFeed(), name='upcoming_events_feed'),
+url(r'^ical/calendar/(.*)/$', CalendarICalendar(), name='calendar_ical'),
 
-(r'^ical/calendar/(.*)/$', CalendarICalendar()),
-
- url(r'^$', ListView.as_view(queryset=Calendar.objects.all()), name='schedule'),
+url(r'^$', ListView.as_view(queryset=Calendar.objects.all()), name='schedule'),
 )
