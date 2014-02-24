@@ -36,8 +36,9 @@ def calendar(request, calendar_slug, template='schedule/calendar.html'):
     }, context_instance=RequestContext(request))
 
 
-def calendar_by_periods(request, calendar_slug, category_slug=None, periods=None,
-    template_name="schedule/calendar_by_period.html", tzinfo=None):
+def calendar_by_periods(request, calendar_slug, category_slug=None,
+                        periods=None,
+                        template_name="schedule/calendar_by_period.html"):
     """
     This view is for getting a calendar, but also getting periods with that
     calendar.  Which periods you get, is designated with the list periods. You
@@ -77,23 +78,26 @@ def calendar_by_periods(request, calendar_slug, category_slug=None, periods=None
     category = None
     if category_slug:
         category = get_object_or_404(EventCategory, slug=category_slug)
-    date = coerce_date_dict(request.GET)
-    if tzinfo is None:
-        tzinfo = timezone.get_default_timezone()
-    # if no date, use current date for timezone specified by tzinfo
+
+    try:
+        date = coerce_date_dict(request.GET)
+    except ValueError:
+        raise Http404
+
     if date:
         try:
             date = datetime.datetime(**date)
         except ValueError:
             raise Http404
     else:
-        date = timezone.now().astimezone(tzinfo).date()
+        date = timezone.now()
+
     if category:
         event_list = GET_EVENTS_FUNC(request, calendar, category)
     else:
         event_list = GET_EVENTS_FUNC(request, calendar)
     period_objects = dict([(period.__name__.lower(), period(event_list, date)) for period in periods])
-    return render_to_response(template_name,{
+    return render_to_response(template_name, {
             'date': date,
             'periods': period_objects,
             'calendar': calendar,
@@ -101,6 +105,7 @@ def calendar_by_periods(request, calendar_slug, category_slug=None, periods=None
             'weekday_names': weekday_names,
             'here':quote(request.get_full_path()),
         },context_instance=RequestContext(request),)
+
 
 def event(request, event_slug, template_name="schedule/event.html"):
     """
@@ -127,6 +132,7 @@ def event(request, event_slug, template_name="schedule/event.html"):
         "event": event,
         "back_url" : back_url,
     }, context_instance=RequestContext(request))
+
 
 def occurrence(request, event_slug,
     template_name="schedule/occurrence.html", *args, **kwargs):
