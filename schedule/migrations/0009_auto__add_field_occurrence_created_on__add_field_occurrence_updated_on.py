@@ -3,6 +3,7 @@ import datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
+from django.utils.timezone import utc
 
 
 class Migration(SchemaMigration):
@@ -10,12 +11,12 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding field 'Occurrence.created_on'
         db.add_column(u'schedule_occurrence', 'created_on',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, default=datetime.datetime(2014, 2, 23, 0, 0), blank=True),
+                      self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, default=datetime.datetime.utcnow().replace(tzinfo=utc), blank=True),
                       keep_default=False)
 
         # Adding field 'Occurrence.updated_on'
         db.add_column(u'schedule_occurrence', 'updated_on',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2014, 2, 23, 0, 0), blank=True),
+                      self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime.utcnow().replace(tzinfo=utc), blank=True),
                       keep_default=False)
 
 
