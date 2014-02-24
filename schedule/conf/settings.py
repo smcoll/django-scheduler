@@ -59,3 +59,5 @@ if not GET_EVENTS_FUNC:
 
 # URL to redirect to to after an occurrence is canceled
 OCCURRENCE_CANCEL_REDIRECT = get_config('OCCURRENCE_CANCEL_REDIRECT', None)
+
+SCHEDULE_UPLOAD_TO = get_config('SCHEDULE_UPLOAD_TO', 'schedule/%y/%m')
